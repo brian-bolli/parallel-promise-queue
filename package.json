@@ -1,0 +1,31 @@
+{
+  "name": "parallel-promise-queue",
+  "description": "Provides a single function to handle a parallel promise queue with ability to dictate concurrency.",
+  "version": "1.0.0",
+  "main": "dist/ppq.js",
+  "scripts": {
+    "pretest": "yarn lint",
+    "test": "mocha test/**/*.spec.js",
+    "test:coverage": "nyc yarn test",
+    "lint": "tslint ./src/**/*.ts",
+    "prebuild": "yarn lint",
+    "build": "webpack --progress"
+  },
+  "author": "Binary Pursuits <bbolli@binarypursuits.com>",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.5.8",
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.2",
+    "mocha": "^5.2.0",
+    "nyc": "^14.0.0",
+    "ts-loader": "^5.4.3",
+    "tslint": "^5.15.0",
+    "typescript": "^3.3.4",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
+  }
+}
