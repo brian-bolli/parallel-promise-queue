@@ -1,17 +1,17 @@
-# Promises
+# Parallel Promise Queue
 
 Promise Queue utility to execute a single promise against an array of any values with concurrency and ordering control. The idea originates from a highly recommended book (Node.js Design Patterns) and thought it would be a great way to learn more about TypeScript and Webpack.
 
 ## Installing
 
 ```
-npm install promises
+npm install parallel-promise-queue
 ```
 
 or
 
 ```
-yarn add promises
+yarn add parallel-promise-queue
 ```
 
 ## Running the tests
@@ -39,7 +39,7 @@ The module is a function which takes four parameters.
 
 #### Example
 ```
-const promises = require('promises');
+const promises = require('parallel-promise-queue');
 const promises.execute(promiseMethod, dataArray, 1, true)
                 .then(result => resultHandler)
                 .catch(error => errorHandler);
