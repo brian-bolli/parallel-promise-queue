@@ -12,6 +12,10 @@
     "build": "webpack --progress"
   },
   "author": "Binary Pursuits <bbolli@binarypursuits.com>",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/binarypursuits/parallel-promise-queue.git"
+  },
   "license": "MIT",
   "private": false,
   "devDependencies": {
