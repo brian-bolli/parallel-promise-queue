@@ -1,7 +1,7 @@
 {
   "name": "parallel-promise-queue",
   "description": "Provides a single function to handle a parallel promise queue with ability to dictate concurrency.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/ppq.js",
   "scripts": {
     "pretest": "yarn lint",
@@ -12,6 +12,10 @@
     "build": "webpack --progress"
   },
   "author": "Binary Pursuits <bbolli@binarypursuits.com>",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/binarypursuits/parallel-promise-queue.git"
+  },
   "license": "MIT",
   "private": false,
   "devDependencies": {
