@@ -13,8 +13,8 @@
   },
   "author": "Binary Pursuits <bbolli@binarypursuits.com>",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/binarypursuits/parallel-promise-queue.git"
+    "type": "git",
+    "url": "https://github.com/binarypursuits/parallel-promise-queue.git"
   },
   "license": "MIT",
   "private": false,
@@ -30,6 +30,6 @@
     "tslint": "^5.15.0",
     "typescript": "^3.3.4",
     "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.1"
+    "webpack-cli": "^3.3.12"
   }
 }
