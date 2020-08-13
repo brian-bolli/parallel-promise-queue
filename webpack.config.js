@@ -23,8 +23,8 @@ module.exports = {
     },
 
     output: {
-        filename: "ppq.js",
-		path: path.join(__dirname, "dist"),
+        filename: "index.js",
+		path: path.join(__dirname, "./"),
 		libraryTarget: "umd",
 		globalObject: "this"
 	}
