@@ -1,6 +1,6 @@
 "use strict";
 
-const promises = require('../dist/ppq');
+const promises = require('../dist/index');
 const { assert } = require("chai");
 
 const dataLength = 10;
@@ -41,7 +41,7 @@ describe("Promises", () => {
 			}
 
 			// Parse data and store
-			promises.execute(dataSet, TestPromise, 1)
+			promises(dataSet, TestPromise, 1)
 				.then(result => {
 					resultSet = result;
 					done();
@@ -103,7 +103,7 @@ describe("Promises", () => {
 
 		before((done)=>{
 
-			promises.execute(dataSet, TestPromise, 2)
+			promises(dataSet, TestPromise, 2)
 				.then(result => {
 					resultSet = result;
 					done();
@@ -164,7 +164,7 @@ describe("Promises", () => {
 		let resultSet;
 
 		before((done)=>{
-			promises.execute(dataSet, TestPromise, 5)
+			promises(dataSet, TestPromise, 5)
 				.then(result => {
 					resultSet = result;
 					done();

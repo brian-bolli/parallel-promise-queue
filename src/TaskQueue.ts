@@ -1,27 +1,32 @@
 "use strict";
 
-export default class TaskQueue {
+export type IPromiseTask<R> = () => Promise<boolean>;
+
+export default class TaskQueue<R> {
 
     private concurrency: number;
     private running: number = 0;
-    private queue: Array<Promise<any>> = [];
+    private queue: Array<IPromiseTask<R>> = [];
 
     constructor(concurrency: number) {
         this.concurrency = concurrency;
     }
 
-    public pushTask(task: Promise<any>): void {
+    public pushTask(task: IPromiseTask<R>): void {
         this.queue.push(task);
         this.next();
     }
 
     public next(): void {
         while (this.running < this.concurrency && this.queue.length) {
-            const task: any = this.queue.shift();
-            task().then(() => {
-                this.running--;
-                this.next();
-            });
+			const task: IPromiseTask<R> | undefined = this.queue.shift();
+			if (task) {
+				task().then((result: boolean) => {
+					this.running--;
+					this.next();
+					return result;
+				});
+			}
             this.running++;
         }
     }

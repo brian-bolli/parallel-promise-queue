@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
-    "sourceMap": true,
+	"outDir": "./dist",
+	"declaration": true,
+	"sourceMap": true,
+	"strict": true,
     "module": "commonjs",
     "target": "es5",
 	"lib": ["es6"],
@@ -9,6 +11,10 @@
     "moduleResolution": "node"
   },
   "include": [
-	"src/**/*.ts"
+	"src"
+	],
+	"exclude": [
+		"node_modules",
+		"tests"
 	]
 }

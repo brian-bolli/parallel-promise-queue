@@ -24,9 +24,10 @@ module.exports = {
 
     output: {
         filename: "index.js",
-		path: path.join(__dirname, "./"),
-		libraryTarget: "umd",
-		globalObject: "this"
+		path: path.join(__dirname, "./dist"),
+		library: "parallel-promise-queue",
+		libraryTarget: "commonjs2",
+		libraryExport: "default"
 	}
 
 };
