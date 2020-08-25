@@ -1,9 +1,10 @@
 {
   "name": "parallel-promise-queue",
   "description": "Provides a single function to handle a parallel promise queue with ability to dictate concurrency and preserve ordering.",
-  "version": "2.0.0",
+  "keywords": ["Promise", "Queue", "Sequential", "Parallel", "Concurrent"],
+  "version": "2.0.1",
   "main": "dist/index.js",
-  "typings": "dist/index",
+  "types": "dist/index.d.ts",
   "scripts": {
     "pretest": "npm run lint",
     "test:js": "mocha tests/**/*.spec.js",
@@ -20,6 +21,9 @@
     "url": "https://github.com/brian-bolli/parallel-promise-queue.git"
   },
   "license": "MIT",
+  "bugs": {
+	"url": "https://github.com/brian-bolli/parallel-promise-queue/issues"
+  },
   "private": false,
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
@@ -40,5 +44,8 @@
     "typescript": "^3.9.7",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
-  }
+  },
+  "files": [
+	  "dist/**/*"
+  ]
 }
