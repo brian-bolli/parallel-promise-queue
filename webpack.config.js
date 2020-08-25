@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
 
@@ -20,13 +21,18 @@ module.exports = {
 
     resolve: {
         extensions: [ ".js", ".ts"]
-    },
+	},
+	
+	plugins: [
+		new CleanWebpackPlugin()
+	],
 
     output: {
         filename: "index.js",
-		path: path.join(__dirname, "./"),
-		libraryTarget: "umd",
-		globalObject: "this"
+		path: path.join(__dirname, "./dist"),
+		library: "parallel-promise-queue",
+		libraryTarget: "commonjs2",
+		libraryExport: "default"
 	}
 
 };
