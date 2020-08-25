@@ -1,14 +1,12 @@
-"use strict";
 import "mocha";
-import { assert } from "chai";
-import promises from "../dist/index";
+import chai from "chai";
+import chaiAsPromised from 'chai-as-promised';
 
-const dataLength = 10;
+chai.use(chaiAsPromised);
 
-let dataSet = [];
-let testable;
+const assert = chai.assert;
 
-let durationRatio = 10;
+import promises, { Concurrency } from "../dist/index";
 
 class DataStats
 {
@@ -25,24 +23,30 @@ class DataStats
 
 function TestPromise(item: DataStats): Promise<DataStats> {
 	return new Promise(resolve => {
-		resolve(item);
-	});	
+		const delay = () => {			
+			resolve(item);
+		};
+		setTimeout(delay, item.duration)
+	});
 }
 
-describe("Promises", () => {
+describe("Promises - TypeScript", () => {
 
-	describe("(1) Concurrency Execution with Sequencing True", () => {
+	describe("1) Concurrency three Execution with preserve sequencing", () => {
 
-		let resultSet;
+		let dataLength = 10;
+		let resultSet: DataStats[] = [];
+		let dataSet: DataStats[] = [];		
 
 		// Generate dataset with timings inversed to test sequencing
-		before((done)=>{
+		before(function (done) {
+			this.timeout(10000);
 			for (let i = 0; i < dataLength; i++) {
 				dataSet.push(new DataStats(i, (dataLength - i) * 100));
 			}
 
 			// Parse data and store
-			promises<DataStats, DataStats>(dataSet, TestPromise, 1)
+			promises<DataStats, DataStats>(dataSet, TestPromise, Concurrency.THREE)
 				.then(result => {
 					resultSet = result;
 					done();
@@ -52,177 +56,109 @@ describe("Promises", () => {
 				});
 		});
 
-		after(() => {
-			console.log(resultSet);
-		})
-
 		it("Load and execute all promises", () => {
-			assert.equal(resultSet.length, 10);
+			assert.equal(resultSet.length, dataLength);
 		});
 
-		it("Preserve Order of Position 0", () => {
+		it("Preserve order regardless when promise resolves", () => {
 			assert.equal(resultSet[0].position, 0);
-		});
-
-		it("Preserve Order of Position 1", () => {
 			assert.equal(resultSet[1].position, 1);
-		});
-
-		it("Preserve Order of Position 2", () => {
 			assert.equal(resultSet[2].position, 2);
-		});
-
-		it("Preserve Order of Position 3", () => {
 			assert.equal(resultSet[3].position, 3);
-		});
-
-		it("Preserve Order of Position 4", () => {
 			assert.equal(resultSet[4].position, 4);
-		});
-
-		it("Preserve Order of Position 5", () => {
 			assert.equal(resultSet[5].position, 5);
-		});
-
-		it("Preserve Order of Position 6", () => {
 			assert.equal(resultSet[6].position, 6);
-		});
-
-		it("Preserve Order of Position 7", () => {
 			assert.equal(resultSet[7].position, 7);
-		});
-
-		it("Preserve Order of Position 8", () => {
 			assert.equal(resultSet[8].position, 8);
-		});
-
-		it("Preserve Order of Position 9", () => {
 			assert.equal(resultSet[9].position, 9);
 		});
 
 	});
 
-	// describe("(2) Concurrency Execution", () => {
+	describe("2) Concurrency five execution without preserve sequencing", () => {
+		
+		let dataLength = 5;
+		let resultSet: DataStats[] = [];
+		let dataSet: DataStats[] = [];
 
-	// 	let resultSet;
+		// Generate dataset with timings inversed to test sequencing
+		before(function (done) {
+			this.timeout(100000);
+			for (let i = 0; i < dataLength; i++) {
+				let delay = (dataLength - i) * 1000;
+				dataSet.push(new DataStats(i, delay));
+			}
 
-	// 	before((done)=>{
+			// Parse data and store
+			promises<DataStats, DataStats>(dataSet, TestPromise, Concurrency.FIVE, false)
+				.then(result => {
+					resultSet = result;
+					done();
+				})
+				.catch(error => {
+					throw new Error(error);
+				});
+		});
 
-	// 		promises(dataSet, TestPromise, 2)
-	// 			.then(result => {
-	// 				resultSet = result;
-	// 				done();
-	// 			})
-	// 			.catch(error => {
-	// 				throw new Error(error);
-	// 			});
-	// 	});
+		it("Load and execute all promises", () => {
+			assert.equal(resultSet.length, dataLength);
+		});
 
-	// 	it("Load and execute all promises", () => {
-	// 		assert.equal(resultSet.length, 10);
-	// 	});
+		it("Order determined by promise resolves", () => {
+			assert.equal(resultSet[0].position, 4);
+			assert.equal(resultSet[1].position, 3);
+			assert.equal(resultSet[2].position, 2);
+			assert.equal(resultSet[3].position, 1);
+			assert.equal(resultSet[4].position, 0);
+		});
 
-	// 	it("Preserve Order of Position 0", () => {
-	// 		assert.equal(resultSet[0].position, 0);
-	// 	});
+	});
 
-	// 	it("Preserve Order of Position 1", () => {
-	// 		assert.equal(resultSet[1].position, 1);
-	// 	});
+	describe("3) Concurrency value which are out of bounds", () => {
 
-	// 	it("Preserve Order of Position 2", () => {
-	// 		assert.equal(resultSet[2].position, 2);
-	// 	});
+		let dataLength = 1;
+		let resultSet: DataStats[] = [];
+		let dataSet: DataStats[] = [];
 
-	// 	it("Preserve Order of Position 3", () => {
-	// 		assert.equal(resultSet[3].position, 3);
-	// 	});
+		// Generate dataset with timings inversed to test sequencing
+		before(function (done) {
+			for (let i = 0; i < dataLength; i++) {
+				dataSet.push(new DataStats(i, 0));
+			}
+			done();
+		});
 
-	// 	it("Preserve Order of Position 4", () => {
-	// 		assert.equal(resultSet[4].position, 4);
-	// 	});
+		it("A value below one for concurrency forces promise rejection", () => {
+			assert.isRejected(promises(dataSet, TestPromise, 0), 'A integer value between 0 and 5 must be used for the concurrency parameter');
+		});
 
-	// 	it("Preserve Order of Position 5", () => {
-	// 		assert.equal(resultSet[5].position, 5);
-	// 	});
+		it("A value above five for concurrency forces promise rejection", () => {
+			assert.isRejected(promises(dataSet, TestPromise, 6), 'A integer value between 0 and 5 must be used for the concurrency parameter');
+		});
 
-	// 	it("Preserve Order of Position 6", () => {
-	// 		assert.equal(resultSet[6].position, 6);
-	// 	});
+	});
 
-	// 	it("Preserve Order of Position 7", () => {
-	// 		assert.equal(resultSet[7].position, 7);
-	// 	});
+	describe("4) Concurrency enum properly export and has valid values", () => {
 
-	// 	it("Preserve Order of Position 8", () => {
-	// 		assert.equal(resultSet[8].position, 8);
-	// 	});
+		it("Concurrency.ONE represent the digit 1", () => {
+			assert.equal(Concurrency.ONE, 1);
+		});
 
-	// 	it("Preserve Order of Position 9", () => {
-	// 		assert.equal(resultSet[9].position, 9);
-	// 	});
+		it("Concurrency.TWO represent the digit 2", () => {
+			assert.equal(Concurrency.TWO, 2);
+		});
 
-	// });
+		it("Concurrency.THREE represent the digit 3", () => {
+			assert.equal(Concurrency.THREE, 3);
+		});
 
-	// describe("(5) Concurrency Execution", () => {
+		it("Concurrency.FOUR represent the digit 4", () => {
+			assert.equal(Concurrency.FOUR, 4);
+		});
 
-	// 	let resultSet;
-
-	// 	before((done)=>{
-	// 		promises(dataSet, TestPromise, 5)
-	// 			.then(result => {
-	// 				resultSet = result;
-	// 				done();
-	// 			})
-	// 			.catch(error => {
-	// 				throw new Error(error);
-	// 			});
-	// 	});
-
-	// 	it("Load and execute all promises", () => {
-	// 		assert.equal(resultSet.length, 10);
-	// 	});
-
-	// 	it("Preserve Order of Position 0", () => {
-	// 		assert.equal(resultSet[0].position, 0);
-	// 	});
-
-	// 	it("Preserve Order of Position 1", () => {
-	// 		assert.equal(resultSet[1].position, 1);
-	// 	});
-
-	// 	it("Preserve Order of Position 2", () => {
-	// 		assert.equal(resultSet[2].position, 2);
-	// 	});
-
-	// 	it("Preserve Order of Position 3", () => {
-	// 		assert.equal(resultSet[3].position, 3);
-	// 	});
-
-	// 	it("Preserve Order of Position 4", () => {
-	// 		assert.equal(resultSet[4].position, 4);
-	// 	});
-
-	// 	it("Preserve Order of Position 5", () => {
-	// 		assert.equal(resultSet[5].position, 5);
-	// 	});
-
-	// 	it("Preserve Order of Position 6", () => {
-	// 		assert.equal(resultSet[6].position, 6);
-	// 	});
-
-	// 	it("Preserve Order of Position 7", () => {
-	// 		assert.equal(resultSet[7].position, 7);
-	// 	});
-
-	// 	it("Preserve Order of Position 8", () => {
-	// 		assert.equal(resultSet[8].position, 8);
-	// 	});
-
-	// 	it("Preserve Order of Position 9", () => {
-	// 		assert.equal(resultSet[9].position, 9);
-	// 	});
-
-	// });
+		it("Concurrency.FIVE represent the digit 5", () => {
+			assert.equal(Concurrency.FIVE, 5);
+		});
+	});
 
 });

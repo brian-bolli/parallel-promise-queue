@@ -1,5 +1,5 @@
 export declare type IPromiseFunction<T, R> = (item: T) => Promise<R>;
-export declare enum Concurrency {
+export declare const enum Concurrency {
     ONE = 1,
     TWO = 2,
     THREE = 3,

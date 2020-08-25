@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
 
@@ -20,7 +21,11 @@ module.exports = {
 
     resolve: {
         extensions: [ ".js", ".ts"]
-    },
+	},
+	
+	plugins: [
+		new CleanWebpackPlugin()
+	],
 
     output: {
         filename: "index.js",

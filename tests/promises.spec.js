@@ -1,12 +1,10 @@
-"use strict";
-
 const promises = require('../dist/index');
-const { assert } = require("chai");
+const chai = require("chai");
+const chaiAsPromised = require("chai-as-promised");
 
-const dataLength = 10;
+chai.use(chaiAsPromised);
 
-let dataSet = [];
-let testable;
+const assert = chai.assert;
 
 class DataStats
 {
@@ -18,30 +16,31 @@ class DataStats
 }
 
 function TestPromise(item) {
-	return new Promise((resolve, reject) => {
-		setTimeout(function(){
-			if (item.fail) {
-				return reject(item);
-			}
+	return new Promise(resolve => {
+		const delay = () => {			
 			resolve(item);
-		}, item.duration);
+		};
+		setTimeout(delay, item.duration)
 	});
 }
 
-describe("Promises", () => {
+describe("Promises - JavaScript", () => {
 
-	describe("(1) Concurrency Execution with Sequencing True", () => {
+	describe("1) Concurrency three Execution with preserve sequencing", () => {
 
-		let resultSet;
+		const dataLength = 10;
+		let resultSet = [];
+		let dataSet = [];
 
 		// Generate dataset with timings inversed to test sequencing
-		before((done)=>{
+		before(function (done) {
+			this.timeout(10000);
 			for (let i = 0; i < dataLength; i++) {
-				dataSet.push(new DataStats(i, (dataLength - i)));
+				dataSet.push(new DataStats(i, (dataLength - i) * 100));
 			}
 
 			// Parse data and store
-			promises(dataSet, TestPromise, 1)
+			promises(dataSet, TestPromise, 3)
 				.then(result => {
 					resultSet = result;
 					done();
@@ -52,58 +51,39 @@ describe("Promises", () => {
 		});
 
 		it("Load and execute all promises", () => {
-			assert.equal(resultSet.length, 10);
+			assert.equal(resultSet.length, dataLength);
 		});
 
-		it("Preserve Order of Position 0", () => {
+		it("Preserve order regardless when promise resolves", () => {
 			assert.equal(resultSet[0].position, 0);
-		});
-
-		it("Preserve Order of Position 1", () => {
 			assert.equal(resultSet[1].position, 1);
-		});
-
-		it("Preserve Order of Position 2", () => {
 			assert.equal(resultSet[2].position, 2);
-		});
-
-		it("Preserve Order of Position 3", () => {
 			assert.equal(resultSet[3].position, 3);
-		});
-
-		it("Preserve Order of Position 4", () => {
 			assert.equal(resultSet[4].position, 4);
-		});
-
-		it("Preserve Order of Position 5", () => {
 			assert.equal(resultSet[5].position, 5);
-		});
-
-		it("Preserve Order of Position 6", () => {
 			assert.equal(resultSet[6].position, 6);
-		});
-
-		it("Preserve Order of Position 7", () => {
 			assert.equal(resultSet[7].position, 7);
-		});
-
-		it("Preserve Order of Position 8", () => {
 			assert.equal(resultSet[8].position, 8);
-		});
-
-		it("Preserve Order of Position 9", () => {
 			assert.equal(resultSet[9].position, 9);
 		});
 
 	});
 
-	describe("(2) Concurrency Execution", () => {
+	describe("2) Concurrency five execution without preserve sequencing", () => {
 
-		let resultSet;
+		const dataLength = 5;
+		let resultSet = [];
+		let dataSet = [];
 
-		before((done)=>{
+		// Generate dataset with timings inversed to test sequencing
+		before(function (done) {
+			this.timeout(100000);
+			for (let i = 0; i < dataLength; i++) {
+				dataSet.push(new DataStats(i, (dataLength - i) * 1000));
+			}
 
-			promises(dataSet, TestPromise, 2)
+			// Parse data and store
+			promises(dataSet, TestPromise, 5, false)
 				.then(result => {
 					resultSet = result;
 					done();
@@ -114,108 +94,41 @@ describe("Promises", () => {
 		});
 
 		it("Load and execute all promises", () => {
-			assert.equal(resultSet.length, 10);
+			assert.equal(resultSet.length, dataLength);
 		});
 
-		it("Preserve Order of Position 0", () => {
-			assert.equal(resultSet[0].position, 0);
-		});
-
-		it("Preserve Order of Position 1", () => {
-			assert.equal(resultSet[1].position, 1);
-		});
-
-		it("Preserve Order of Position 2", () => {
+		it("Order determined by promise resolves", () => {
+			assert.equal(resultSet[0].position, 4);
+			assert.equal(resultSet[1].position, 3);
 			assert.equal(resultSet[2].position, 2);
-		});
-
-		it("Preserve Order of Position 3", () => {
-			assert.equal(resultSet[3].position, 3);
-		});
-
-		it("Preserve Order of Position 4", () => {
-			assert.equal(resultSet[4].position, 4);
-		});
-
-		it("Preserve Order of Position 5", () => {
-			assert.equal(resultSet[5].position, 5);
-		});
-
-		it("Preserve Order of Position 6", () => {
-			assert.equal(resultSet[6].position, 6);
-		});
-
-		it("Preserve Order of Position 7", () => {
-			assert.equal(resultSet[7].position, 7);
-		});
-
-		it("Preserve Order of Position 8", () => {
-			assert.equal(resultSet[8].position, 8);
-		});
-
-		it("Preserve Order of Position 9", () => {
-			assert.equal(resultSet[9].position, 9);
+			assert.equal(resultSet[3].position, 1);
+			assert.equal(resultSet[4].position, 0);
 		});
 
 	});
 
-	describe("(5) Concurrency Execution", () => {
+	describe("3) Concurrency value which are out of bounds", () => {
 
-		let resultSet;
+		const dataLength = 5;
+		let resultSet = [];
+		let dataSet = [];
 
-		before((done)=>{
-			promises(dataSet, TestPromise, 5)
-				.then(result => {
-					resultSet = result;
-					done();
-				})
-				.catch(error => {
-					throw new Error(error);
-				});
+		// Generate dataset with timings inversed to test sequencing
+		before(function (done) {
+			this.timeout(100000);
+			for (let i = 0; i < dataLength; i++) {
+				dataSet.push(new DataStats(i, (dataLength - i) * 1000));
+			}
+			done();
 		});
 
-		it("Load and execute all promises", () => {
-			assert.equal(resultSet.length, 10);
+
+		it("A value below one for concurrency forces promise rejection", () => {
+			assert.isRejected(promises(dataSet, TestPromise, 0), 'A integer value between 0 and 5 must be used for the concurrency parameter');
 		});
 
-		it("Preserve Order of Position 0", () => {
-			assert.equal(resultSet[0].position, 0);
-		});
-
-		it("Preserve Order of Position 1", () => {
-			assert.equal(resultSet[1].position, 1);
-		});
-
-		it("Preserve Order of Position 2", () => {
-			assert.equal(resultSet[2].position, 2);
-		});
-
-		it("Preserve Order of Position 3", () => {
-			assert.equal(resultSet[3].position, 3);
-		});
-
-		it("Preserve Order of Position 4", () => {
-			assert.equal(resultSet[4].position, 4);
-		});
-
-		it("Preserve Order of Position 5", () => {
-			assert.equal(resultSet[5].position, 5);
-		});
-
-		it("Preserve Order of Position 6", () => {
-			assert.equal(resultSet[6].position, 6);
-		});
-
-		it("Preserve Order of Position 7", () => {
-			assert.equal(resultSet[7].position, 7);
-		});
-
-		it("Preserve Order of Position 8", () => {
-			assert.equal(resultSet[8].position, 8);
-		});
-
-		it("Preserve Order of Position 9", () => {
-			assert.equal(resultSet[9].position, 9);
+		it("A value above five for concurrency forces promise rejection", () => {
+			assert.isRejected(promises(dataSet, TestPromise, 6), 'A integer value between 0 and 5 must be used for the concurrency parameter');
 		});
 
 	});

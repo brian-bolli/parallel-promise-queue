@@ -1,15 +1,44 @@
-"use strict";
-
-import TaskQueue, { IPromiseTask } from './TaskQueue';
-
 export type IPromiseFunction<T, R> = (item: T) => Promise<R>;
 
-export enum Concurrency {
+export const enum Concurrency {
 	ONE = 1,
 	TWO = 2, 
 	THREE = 3,
 	FOUR = 4,
 	FIVE = 5
+}
+
+type IPromiseTask<R> = () => Promise<boolean>;
+
+class TaskQueue<R> {
+
+    private _concurrency: Concurrency;
+    private _running: number = 0;
+    private _queue: Array<IPromiseTask<R>> = [];
+
+    constructor(concurrency: number) {
+        this._concurrency = concurrency;
+    }
+
+    public pushTask(task: IPromiseTask<R>): void {
+        this._queue.push(task);
+        this.next();
+    }
+
+    public next(): void {
+        while (this._running < this._concurrency && this._queue.length) {
+			const task: IPromiseTask<R> | undefined = this._queue.shift();
+			if (task) {
+				task().then((result: boolean) => {
+					this._running--;
+					this.next();
+					return result;
+				});
+			}
+            this._running++;
+        }
+    }
+
 }
 
 export default async function promises <T, R> (
@@ -19,9 +48,9 @@ export default async function promises <T, R> (
 	sequential: boolean = true
 ): Promise<R[]> {
 
-	if (concurrency <= 0) {
+	if (concurrency < 1 || concurrency > 5) {
 		return Promise.reject(
-			new Error("A valid integer must be used for concurrency parameter")
+			new Error("A integer value between 0 and 5 must be used for the concurrency parameter")
 		);
 	}
 
@@ -31,20 +60,20 @@ export default async function promises <T, R> (
 		return Promise.resolve([]);
 	}
 
-	const queue = new TaskQueue<R>(concurrency);
+	const queue: TaskQueue<R> = new TaskQueue<R>(concurrency);
 	const results: R[] = [];
 
 	return new Promise (
 
-		(resolve: any, reject: any) => {
+		(resolve, reject): void => {
 
 			let completed: number = 0;
 
 			for (let i = 0; i < length; i++) {
 
-				let item = items[i];
+				let item: T = items[i];
 
-				const task: IPromiseTask<R> = async () => {
+				const task = async (): Promise<boolean> => {
 					try {
 						const result = await promise(item);
 						if (sequential === true) {
@@ -57,7 +86,7 @@ export default async function promises <T, R> (
 							resolve(results);
 						}
 					} catch (e) {
-						return reject(e);
+						reject(e);
 					}
 					return true;
 				}
