@@ -1,16 +1,22 @@
 {
   "name": "parallel-promise-queue",
   "description": "Provides a single function to handle a parallel promise queue with ability to dictate concurrency and preserve ordering.",
-  "keywords": ["Promise", "Queue", "Sequential", "Parallel", "Concurrent"],
-  "version": "2.0.1",
+  "keywords": [
+    "Promise",
+    "Queue",
+    "Sequential",
+    "Parallel",
+    "Concurrent"
+  ],
+  "version": "2.0.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "pretest": "npm run lint",
     "test:js": "mocha tests/**/*.spec.js",
     "test:ts": "mocha -r ts-node/register tests/**/*.spec.ts --recursive",
-	"test:all": "npm run test:js && npm run test:ts",
-	"test": "nyc npm run test:all",
+    "test:all": "npm run test:js && npm run test:ts",
+    "test": "nyc npm run test:all",
     "lint": "tslint ./src/**/*.ts",
     "prebuild": "npm run lint",
     "build": "webpack --progress"
@@ -22,7 +28,7 @@
   },
   "license": "MIT",
   "bugs": {
-	"url": "https://github.com/brian-bolli/parallel-promise-queue/issues"
+    "url": "https://github.com/brian-bolli/parallel-promise-queue/issues"
   },
   "private": false,
   "devDependencies": {
@@ -42,10 +48,10 @@
     "ts-node": "^9.0.0",
     "tslint": "^6.1.3",
     "typescript": "^3.9.7",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "webpack": "^5.61.0",
+    "webpack-cli": "^4.9.1"
   },
   "files": [
-	  "dist/**/*"
+    "dist/**/*"
   ]
 }
